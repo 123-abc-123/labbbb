@@ -39,6 +39,7 @@ public final class Retry {
         int maxRetries = Math.max(0, maxAttempts - 1);
 
         return Mono.defer(() -> {
+
                     Mono<T> mono;
                     try {
                         mono = fn.get();
