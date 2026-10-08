@@ -63,7 +63,18 @@ class TimeoutTest {
             // When
             StepVerifier.create(Timeout.withTimeout(() -> slowOperation, 100, time))
                     .then(() -> time.advanceTimeBy(Duration.ofMillis(100)))
-                    .expectErrorSatisfies(error -> assertOperationTimeout(error, 100))
+                    .expectErrorSatisfies(error -> {
+                        assertTrue(
+                                error instanceof OperationTimeoutException,
+                                () -> "Expected OperationTimeoutException but was: " + error
+                        );
+
+                        assertEquals(
+                                100,
+                                ((OperationTimeoutException) error).getTimeoutMs(),
+                                "Timeout exception should contain the configured timeout value"
+                        );
+                    })
                     .verify(VERIFICATION_TIMEOUT);
 
             // Advance beyond the original operation delay to prove the side effect never happens.
@@ -127,18 +138,5 @@ class TimeoutTest {
                     "Expected attempts at 0ms, 100ms, and 200ms before timeout at 250ms"
             );
         }
-    }
-
-    private static void assertOperationTimeout(Throwable error, long expectedTimeoutMs) {
-        assertTrue(
-                error instanceof OperationTimeoutException,
-                () -> "Expected OperationTimeoutException but was: " + error
-        );
-
-        assertEquals(
-                expectedTimeoutMs,
-                ((OperationTimeoutException) error).getTimeoutMs(),
-                "Timeout exception should contain the configured timeout value"
-        );
     }
 }
