@@ -137,7 +137,7 @@ class TimeoutTest {
 
         assertEquals(
                 expectedTimeoutMs,
-                ((OperationTimeoutException) error).getTimeout(),
+                ((OperationTimeoutException) error).getTimeoutMs(),
                 "Timeout exception should contain the configured timeout value"
         );
     }
